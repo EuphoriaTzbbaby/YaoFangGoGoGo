@@ -1,0 +1,57 @@
+#name: Deploy Spring Boot Application
+#
+#on:
+#  push:
+#    branches:
+#      - springboot
+#
+#jobs:
+#  deploy:
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v3
+#
+#      - name: Set up JDK 17
+#        uses: actions/setup-java@v3
+#        with:
+#          distribution: 'temurin'
+#          java-version: 17
+#
+#      - name: Build Maven package (skip tests)
+#        run: mvn clean package -DskipTests
+#
+#      - name: Upload JAR to server
+#        uses: appleboy/scp-action@v0.1.4
+#        with:
+#          host: 47.101.42.177
+#          username: root
+#          key: ${{ secrets.SSH_PRIVATE_KEY }}
+#          port: 22
+#          source: target/clever-Class-0.0.1-SNAPSHOT.jar
+#          target: /var/www/html/springbootAndVue/cms
+#          strip_components: 1  # ✅ 就是这句去掉 target 文件夹
+#
+#      - name: Build and run Docker container on server
+#        uses: appleboy/ssh-action@v0.1.7
+#        with:
+#          host: 47.101.42.177
+#          username: root
+#          key: ${{ secrets.SSH_PRIVATE_KEY }}
+#          port: 22
+#          script: |
+#            cd /var/www/html/springbootAndVue/cms
+#            docker build -t sb-cms .
+#            docker stop spring-cms || true
+#            docker rm spring-cms || true
+#            docker run -d --name spring-cms -p 9986:9986 --network blog sb-cms
+#
+##
+##  -----BEGIN OPENSSH PRIVATE KEY-----
+##  b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
+##  QyNTUxOQAAACARdVYgiLCwlFsSdM9+q80K9W0DbqeHxd6RQ1z6uakaEgAAAKB+ANBufgDQ
+##  bgAAAAtzc2gtZWQyNTUxOQAAACARdVYgiLCwlFsSdM9+q80K9W0DbqeHxd6RQ1z6uakaEg
+##  AAAEAWNhY2jWKc2x6aC4LDmrIWTULIP/PcgF5Fq/aM9HZ+GRF1ViCIsLCUWxJ0z36rzQr1
+##  bQNup4fF3pFDXPq5qRoSAAAAHHJvb3RAaVp1ZjY5bzVnbDIxY2FxMmJpZWhvZVoB
+##  -----END OPENSSH PRIVATE KEY-----
